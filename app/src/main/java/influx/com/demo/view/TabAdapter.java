@@ -1,6 +1,8 @@
 package influx.com.demo.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,7 +21,7 @@ import java.util.List;
 import influx.com.demo.R;
 import influx.com.demo.model.Fnblist;
 
-public class TabAdapter extends RecyclerView.Adapter<TabAdapter.MyViewHolder>{
+public class TabAdapter extends RecyclerView.Adapter<TabAdapter.MyViewHolder> {
     private List<Fnblist> foodLists;
     private LinearLayout my_linear_layout;
     private Context context;
@@ -38,31 +40,31 @@ public class TabAdapter extends RecyclerView.Adapter<TabAdapter.MyViewHolder>{
     int[] _counter = new int[10];
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView title, item_sub,item_count;
-        public ImageView list_image, list_icon,item_minus,item_plus;
+        public TextView title, item_sub, item_count;
+        public ImageView list_image, list_icon, item_minus, item_plus;
 
         public MyViewHolder(View view) {
             super(view);
             title = (TextView) view.findViewById(R.id.item_name);
-            item_sub = (TextView)view.findViewById(R.id.item_sub);
+            item_sub = (TextView) view.findViewById(R.id.item_sub);
             my_linear_layout = (LinearLayout) view.findViewById(R.id.insert_point);
-            list_image = (ImageView)view.findViewById(R.id.list_image);
-            list_icon = (ImageView)view.findViewById(R.id.list_icon);
+            list_image = (ImageView) view.findViewById(R.id.list_image);
+            list_icon = (ImageView) view.findViewById(R.id.list_icon);
             item_count = (TextView) view.findViewById(R.id.item_count);
-            item_minus = (ImageView)view.findViewById(R.id.item_minus);
-            item_plus = (ImageView)view.findViewById(R.id.item_plus);
+            item_minus = (ImageView) view.findViewById(R.id.item_minus);
+            item_plus = (ImageView) view.findViewById(R.id.item_plus);
             //item_count.setText(String.valueOf(_counter));
         }
     }
 
-    public TabAdapter(List<Fnblist> foodLists, String currency, Context context,View view) {
+    public TabAdapter(List<Fnblist> foodLists, String currency, Context context, View view) {
         this.foodLists = foodLists;
         this.context = context;
         this.currency = currency;
         this.view = view;
 
-        item_amount = (TextView)view.findViewById(R.id.item_amount);
-        second_recyclerview = (RecyclerView)view.findViewById(R.id.recycler_view_sub);
+        item_amount = (TextView) view.findViewById(R.id.item_amount);
+        second_recyclerview = (RecyclerView) view.findViewById(R.id.recycler_view_sub);
 
         secondAdapter = new SecondAdapter(subitem_array, price_array, context);
         RecyclerView.LayoutManager mLayoutManager2 = new LinearLayoutManager(context.getApplicationContext());
@@ -87,56 +89,73 @@ public class TabAdapter extends RecyclerView.Adapter<TabAdapter.MyViewHolder>{
 
         holder.title.setText(String.valueOf(fnblist.getName()));
 
-        if(fnblist.getSubitems()!= null) {
+        if (fnblist.getSubitems() != null) {
             holder.item_sub.setText(String.valueOf(currency));
         }
 
-        UrlImageViewHelper.setUrlDrawable(holder.list_image, fnblist.getImgUrl(),R.drawable.photo_not_available,60000);
+        UrlImageViewHelper.setUrlDrawable(holder.list_image, fnblist.getImgUrl(), R.drawable.photo_not_available, 60000);
 
-        UrlImageViewHelper.setUrlDrawable(holder.list_icon, fnblist.getVegClass(),null,60000);
+        UrlImageViewHelper.setUrlDrawable(holder.list_icon, fnblist.getVegClass(), null, 60000);
 
-        if(fnblist.getSubitems()!= null) {
-            for(int i=0; i<fnblist.getSubitems().size();i++){
-                View view = LayoutInflater.from(context).inflate(R.layout.layout,null);
+        if (fnblist.getSubitems() != null) {
+
+            final ArrayList<LinearLayout> viewList = new ArrayList<>();
+
+            for (int i = 0; i < fnblist.getSubitems().size(); i++) {
+
+                View view = LayoutInflater.from(context).inflate(R.layout.layout, null);
+
                 final LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linearlayout);
-                final TextView textView =(TextView) view.findViewById(R.id.layout_text);
+
+                final TextView textView = (TextView) view.findViewById(R.id.layout_text);
+
                 textView.setText(String.valueOf(fnblist.getSubitems().get(i).getName()));
-                my_linear_layout.addView(view);
-                my_linear_layout.setVisibility(View.VISIBLE);
+
 
                 linearLayout.setId(Integer.parseInt(fnblist.getSubitems().get(i).getVistaSubFoodItemId()));
 
                 linearLayout.setTag(i);
 
-                if(i==0){
+                if (i == 0) {
+
                     linearLayout.setBackground(context.getResources().getDrawable(R.drawable.yellow_bg));
+
                     textView.setTextColor(context.getResources().getColor(R.color.colorPrimary));
-                    holder.item_sub.setText(String.valueOf(currency)+" "+String.valueOf(fnblist.getSubitems().get(i).getSubitemPrice()));
+
+                    holder.item_sub.setText(String.valueOf(currency) + " " + String.valueOf(fnblist.getSubitems().get(i).getSubitemPrice()));
                 }
 
                 final int finalI = i;
+
+                viewList.add(linearLayout);
+
                 linearLayout.setOnClickListener(new View.OnClickListener() {
+
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onClick(View v) {
 
-                        int pos = 0;
+                        for (int i = 0; i < viewList.size(); i++) {
 
-                        if(v.getTag() instanceof Integer){
-                            pos = (Integer)v.getTag();
+                            viewList.get(i).setBackground(context.getResources().getDrawable(R.drawable.border));
 
-                            linearLayout.setBackground(context.getResources().getDrawable(R.drawable.yellow_bg));
-                            textView.setTextColor(context.getResources().getColor(R.color.colorPrimary));
+                            TextView view1 = viewList.get(i).getChildAt(0).findViewById(R.id.layout_text);
 
-                        }else {
-                            linearLayout.setBackground(context.getResources().getDrawable(R.drawable.border));
-                            textView.setTextColor(context.getResources().getColor(R.color.white));
+                            view1.setTextColor(context.getResources().getColor(R.color.white));
                         }
 
-                        holder.item_sub.setText(String.valueOf(currency)+" "+String.valueOf(fnblist.getSubitems().get(finalI).getSubitemPrice()));
+                        linearLayout.setBackground(context.getResources().getDrawable(R.drawable.yellow_bg));
+                        textView.setTextColor(context.getResources().getColor(R.color.colorPrimary));
+
+                        holder.item_sub.setText(String.valueOf(currency) + " " + String.valueOf(fnblist.getSubitems().get(finalI).getSubitemPrice()));
                     }
                 });
+
+                my_linear_layout.addView(view);
+
+                my_linear_layout.setVisibility(View.VISIBLE);
             }
-        }else {
+        } else {
             my_linear_layout.setVisibility(View.GONE);
         }
 
@@ -155,20 +174,20 @@ public class TabAdapter extends RecyclerView.Adapter<TabAdapter.MyViewHolder>{
 
                 String total_price;
 
-                if(fnblist.getSubitems().size()>0){
+                if (fnblist.getSubitems().size() > 0) {
                     total_price = fnblist.getSubitems().get(position).getSubitemPrice();
-                }else {
+                } else {
                     total_price = fnblist.getItemPrice();
                 }
 
-                _cartprice = Float.valueOf(total_price)* _counter[v.getId()];
+                _cartprice = Float.valueOf(total_price) * _counter[v.getId()];
 
-                System.out.println("Cart price : "+String.valueOf(_cartprice));
+                System.out.println("Cart price : " + String.valueOf(_cartprice));
 
                 item_amount.setText(String.valueOf(_cartprice));
 
-                subitem_array.add(position,fnblist.getName());
-                price_array.add(position,total_price);
+                subitem_array.add(position, fnblist.getName());
+                price_array.add(position, total_price);
 
 
                 secondAdapter.notifyItemInserted(position);
@@ -186,20 +205,20 @@ public class TabAdapter extends RecyclerView.Adapter<TabAdapter.MyViewHolder>{
 
                 _counter[v.getId()]--;
 
-                if(_counter[v.getId()] >= 0){
+                if (_counter[v.getId()] >= 0) {
                     holder.item_count.setText(String.valueOf(_counter[v.getId()]));
                     String total_price;
 
-                    if(fnblist.getSubitems().size()>0){
+                    if (fnblist.getSubitems().size() > 0) {
                         total_price = fnblist.getSubitems().get(position).getSubitemPrice();
-                    }else {
+                    } else {
                         total_price = fnblist.getItemPrice();
                     }
 
-                    _cartprice = Float.valueOf(total_price)* _counter[v.getId()];
+                    _cartprice = Float.valueOf(total_price) * _counter[v.getId()];
 
 
-                    System.out.println("_cartprice"+_cartprice);
+                    System.out.println("_cartprice" + _cartprice);
 
                     item_amount.setText(String.valueOf(_cartprice));
 
@@ -221,7 +240,18 @@ public class TabAdapter extends RecyclerView.Adapter<TabAdapter.MyViewHolder>{
 
     @Override
     public int getItemCount() {
-        return foodLists.size()==0?0:foodLists.size();
+        return foodLists.size() == 0 ? 0 : foodLists.size();
         //return foodLists.size();
+    }
+
+    private double getTotalAmount() {
+
+        if (item_amount != null && item_amount.getText().toString().trim().length() > 0) {
+
+            return Double.parseDouble(item_amount.getText().toString());
+        }
+        else {
+            return 0;
+        }
     }
 }
